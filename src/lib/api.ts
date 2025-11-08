@@ -4,6 +4,7 @@ import type {
   UsageStats,
   UserPreferences,
 } from './types';
+import { ApiError } from './apiError';
 
 const API_URL = import.meta.env.VITE_POST_PILOT_BE_URL || 'http://localhost:8080';
 
@@ -36,8 +37,8 @@ export const api = {
     );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     return response.json();
@@ -55,10 +56,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      const apiError = new Error(error.message || `HTTP ${response.status}`);
-      (apiError as any).status = response.status;
-      throw apiError;
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     const data = await response.json();
@@ -109,8 +108,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     const data = await response.json();
@@ -140,8 +139,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     return response.json();
@@ -163,8 +162,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     return response.json();
@@ -184,8 +183,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
   },
 };
