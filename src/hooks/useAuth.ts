@@ -1,5 +1,4 @@
 import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
-import { useMemo } from 'react';
 
 export function useAuth() {
   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useClerkAuth();

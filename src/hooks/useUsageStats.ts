@@ -3,7 +3,7 @@ import { api } from '@/lib/api';
 import { useAuth } from './useAuth';
 
 export function useUsageStats() {
-  const { getAuthToken, isSignedIn } = useAuth();
+  const { getAuthToken } = useAuth();
 
   return useQuery({
     queryKey: ['usage', 'stats'],

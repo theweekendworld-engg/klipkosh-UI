@@ -58,7 +58,7 @@ describe('API Client', () => {
       json: async () => mockJob,
     });
 
-    const result = await api.getJob('test-job');
+    await api.getJob('test-job');
     expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining('/api/v1/jobs/test-job'),
       expect.any(Object)

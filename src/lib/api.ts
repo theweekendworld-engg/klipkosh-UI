@@ -1,7 +1,6 @@
 import type {
   GenerateRequest,
   Job,
-  JobResult,
   UsageStats,
   UserPreferences,
 } from './types';

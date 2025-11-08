@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -34,7 +34,6 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('Auth Redirect', () => {
   it('redirects unauthenticated users from dashboard', async () => {
-    const { useNavigate } = await import('react-router-dom');
     const mockNavigate = vi.fn();
     vi.spyOn(require('react-router-dom'), 'useNavigate').mockReturnValue(mockNavigate);
 
