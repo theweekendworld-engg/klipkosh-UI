@@ -11,8 +11,8 @@ export function useUsageStats() {
       const token = await getAuthToken();
       return api.getUsageStats(token || undefined);
     },
-    enabled: isSignedIn,
-    refetchInterval: 60000, // Refetch every minute
+    enabled: false, // Disabled - not calling usage API
+    refetchInterval: false, // No automatic refetching
   });
 }
 

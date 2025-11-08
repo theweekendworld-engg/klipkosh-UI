@@ -17,12 +17,9 @@ interface ProviderSelectorProps {
 
 const MODELS: Record<Provider, string[]> = {
   openrouter: [
-    'openai/gpt-4-turbo-preview',
-    'openai/gpt-3.5-turbo',
-    'anthropic/claude-3-opus',
-    'anthropic/claude-3-sonnet',
+    'openai/gpt-5-nano',
   ],
-  openai: ['gpt-4-turbo-preview', 'gpt-3.5-turbo'],
+  openai: ['gpt-5-nano'],
 };
 
 export function ProviderSelector({

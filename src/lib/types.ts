@@ -13,7 +13,7 @@ export interface GenerateRequest {
 
 export interface JobStatus {
   id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'done';
   created_at: string;
   updated_at: string;
   error?: string;
@@ -34,6 +34,8 @@ export interface JobResult {
 
 export interface Job extends JobStatus {
   result?: JobResult['outputs'];
+  video_url?: string;
+  video_id?: string;
 }
 
 export interface UserPreferences {

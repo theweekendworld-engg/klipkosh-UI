@@ -15,10 +15,22 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
   const [copied, setCopied] = useState<string | null>(null);
 
   if (!job.result) {
-    return null;
+    return (
+      <Card>
+        <CardContent className="py-6">
+          <p className="text-sm text-muted-foreground">No results available yet.</p>
+        </CardContent>
+      </Card>
+    );
   }
 
-  const { description, tags, summary, social_caption, hashtags } = job.result;
+  const result = job.result;
+  // Safely extract fields with fallbacks
+  const description = result.description || '';
+  const tags = Array.isArray(result.tags) ? result.tags : (result.tags ? [result.tags] : []);
+  const summary = Array.isArray(result.summary) ? result.summary : (result.summary ? [result.summary] : []);
+  const social_caption = result.social_caption || '';
+  const hashtags = Array.isArray(result.hashtags) ? result.hashtags : (result.hashtags ? [result.hashtags] : []);
 
   const copyToClipboard = async (text: string, label: string) => {
     try {
@@ -63,12 +75,13 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
   return (
     <div className="space-y-6">
       {/* Description Card */}
-      <Card>
+      {description && (
+      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Description</CardTitle>
-              <CardDescription>Video description ready for YouTube</CardDescription>
+              <CardTitle className="text-white">Description</CardTitle>
+              <CardDescription className="text-white/70">Video description ready for YouTube</CardDescription>
             </div>
             <div className="flex gap-2">
               <Button
@@ -77,9 +90,15 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                 onClick={() => copyToClipboard(description, 'Description')}
               >
                 {copied === 'Description' ? (
-                  <Check className="h-4 w-4" />
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Copied!
+                  </>
                 ) : (
-                  <Copy className="h-4 w-4" />
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy
+                  </>
                 )}
               </Button>
               <Button
@@ -87,28 +106,38 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                 size="sm"
                 onClick={() => downloadMarkdown(description, 'description.md')}
               >
-                <Download className="h-4 w-4" />
+                <Download className="mr-2 h-4 w-4" />
+                Download
               </Button>
               {youtubeUrl && (
                 <Button variant="outline" size="sm" onClick={openYouTube}>
-                  <ExternalLink className="h-4 w-4" />
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  YouTube
                 </Button>
               )}
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <p className="whitespace-pre-wrap text-sm">{description}</p>
+          <p 
+            className="whitespace-pre-wrap text-sm text-white/90 cursor-pointer hover:bg-white/10 p-2 rounded transition-colors"
+            onClick={() => copyToClipboard(description, 'Description')}
+            title="Click to copy description"
+          >
+            {description}
+          </p>
         </CardContent>
       </Card>
+      )}
 
       {/* Tags Card */}
-      <Card>
+      {tags.length > 0 && (
+      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Tags</CardTitle>
-              <CardDescription>Suggested tags for your video</CardDescription>
+              <CardTitle className="text-white">Tags</CardTitle>
+              <CardDescription className="text-white/70">Suggested tags for your video</CardDescription>
             </div>
             <div className="flex gap-2">
               <Button
@@ -117,9 +146,15 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                 onClick={() => copyToClipboard(tags.join(', '), 'Tags')}
               >
                 {copied === 'Tags' ? (
-                  <Check className="h-4 w-4" />
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Copied!
+                  </>
                 ) : (
-                  <Copy className="h-4 w-4" />
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy All
+                  </>
                 )}
               </Button>
             </div>
@@ -130,7 +165,9 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
             {tags.map((tag, index) => (
               <span
                 key={index}
-                className="rounded-md bg-secondary px-2 py-1 text-xs font-medium"
+                className="rounded-md bg-secondary px-2 py-1 text-xs font-medium cursor-pointer hover:bg-secondary/80 transition-colors"
+                onClick={() => copyToClipboard(tag, `Tag: ${tag}`)}
+                title="Click to copy"
               >
                 {tag}
               </span>
@@ -138,14 +175,16 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Summary Card */}
-      <Card>
+      {summary.length > 0 && (
+      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Summary</CardTitle>
-              <CardDescription>Key points and notes</CardDescription>
+              <CardTitle className="text-white">Summary</CardTitle>
+              <CardDescription className="text-white/70">Key points and notes</CardDescription>
             </div>
             <Button
               variant="outline"
@@ -153,9 +192,15 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
               onClick={() => copyToClipboard(summary.join('\n'), 'Summary')}
             >
               {copied === 'Summary' ? (
-                <Check className="h-4 w-4" />
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  Copied!
+                </>
               ) : (
-                <Copy className="h-4 w-4" />
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy
+                </>
               )}
             </Button>
           </div>
@@ -163,42 +208,88 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
         <CardContent>
           <ul className="space-y-2">
             {summary.map((item, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm">
-                <span className="mt-1 text-primary">•</span>
-                <span>{item}</span>
+              <li 
+                key={index} 
+                className="flex items-start gap-2 text-sm text-white/90 cursor-pointer hover:bg-white/10 p-2 rounded transition-colors group"
+                onClick={() => copyToClipboard(item, `Summary point ${index + 1}`)}
+                title="Click to copy"
+              >
+                <span className="mt-1 text-pink-400">•</span>
+                <span className="flex-1 text-white/90">{item}</span>
+                <Copy className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
               </li>
             ))}
           </ul>
         </CardContent>
       </Card>
+      )}
 
       {/* Social Caption Card */}
-      <Card>
+      {social_caption && (
+      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Social Caption</CardTitle>
-              <CardDescription>Ready-to-post social media caption</CardDescription>
+              <CardTitle className="text-white">Social Caption</CardTitle>
+              <CardDescription className="text-white/70">Ready-to-post social media caption</CardDescription>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => copyToClipboard(social_caption, 'Social Caption')}
-            >
-              {copied === 'Social Caption' ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Copy className="h-4 w-4" />
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => copyToClipboard(social_caption, 'Social Caption')}
+              >
+                {copied === 'Social Caption' ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Caption
+                  </>
+                )}
+              </Button>
+              {hashtags && hashtags.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(hashtags.map(h => `#${h}`).join(' '), 'Hashtags')}
+                >
+                  {copied === 'Hashtags' ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copy Hashtags
+                    </>
+                  )}
+                </Button>
               )}
-            </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          <p className="whitespace-pre-wrap text-sm">{social_caption}</p>
+          <p 
+            className="whitespace-pre-wrap text-sm text-white/90 cursor-pointer hover:bg-white/10 p-2 rounded transition-colors"
+            onClick={() => copyToClipboard(social_caption, 'Social Caption')}
+            title="Click to copy caption"
+          >
+            {social_caption}
+          </p>
           {hashtags && hashtags.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               {hashtags.map((hashtag, index) => (
-                <span key={index} className="text-xs text-primary">
+                <span 
+                  key={index} 
+                  className="text-xs text-pink-400 cursor-pointer hover:bg-white/10 px-2 py-1 rounded transition-colors"
+                  onClick={() => copyToClipboard(`#${hashtag}`, `Hashtag: #${hashtag}`)}
+                  title="Click to copy"
+                >
                   #{hashtag}
                 </span>
               ))}
@@ -206,6 +297,7 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
           )}
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

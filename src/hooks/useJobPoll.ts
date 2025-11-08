@@ -3,8 +3,8 @@ import { api } from '@/lib/api';
 import { useAuth } from './useAuth';
 import type { Job } from '@/lib/types';
 
-const INITIAL_DELAY = 1000;
-const MAX_DELAY = 10000;
+const INITIAL_DELAY = 10000; // Minimum 10 seconds between polls
+const MAX_DELAY = 30000; // Max 30 seconds
 const BACKOFF_MULTIPLIER = 1.5;
 const MAX_CONSECUTIVE_ERRORS = 5;
 
@@ -26,8 +26,20 @@ export function useJobPoll(jobId: string | null) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const delayRef = useRef(INITIAL_DELAY);
   const consecutiveErrorsRef = useRef(0);
+  const isPollingRef = useRef(false);
+  const jobIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Store current jobId in ref
+    jobIdRef.current = jobId;
+
+    // Cleanup on unmount or jobId change
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    isPollingRef.current = false;
+
     if (!jobId || !isValidJobId(jobId)) {
       setIsPolling(false);
       setJob(null);
@@ -38,28 +50,89 @@ export function useJobPoll(jobId: string | null) {
     setIsPolling(true);
     delayRef.current = INITIAL_DELAY;
     consecutiveErrorsRef.current = 0;
+    isPollingRef.current = true;
 
     const poll = async () => {
+      // Don't poll if we're already stopped or jobId changed
+      if (!isPollingRef.current || jobIdRef.current !== jobId) {
+        return;
+      }
+      
       try {
         const token = await getAuthToken();
         const jobData = await api.getJob(jobId, token || undefined);
+        
+        // Check again if jobId changed during async operation
+        if (jobIdRef.current !== jobId) {
+          return;
+        }
+        
         setJob(jobData);
         setError(null);
         consecutiveErrorsRef.current = 0; // Reset error count on success
 
-        if (jobData.status === 'completed' || jobData.status === 'failed') {
+        // Stop polling if job is done (completed, failed, or done status)
+        // OR if the job has results (meaning it's successfully completed)
+        // Check for any result data, not just non-empty object
+        const hasResults = jobData.result && (
+          (typeof jobData.result === 'object' && 
+           jobData.result !== null &&
+           !Array.isArray(jobData.result) &&
+           Object.keys(jobData.result).length > 0) ||
+          (Array.isArray(jobData.result) && jobData.result.length > 0)
+        );
+        
+        const isJobComplete = 
+          jobData.status === 'completed' || 
+          jobData.status === 'failed' || 
+          jobData.status === 'done' ||
+          hasResults;
+        
+        // Debug logging
+        if (isJobComplete) {
+          console.log('Job complete check:', {
+            status: jobData.status,
+            hasResult: !!jobData.result,
+            resultKeys: jobData.result ? Object.keys(jobData.result) : [],
+            isJobComplete
+          });
+        }
+
+        if (isJobComplete) {
+          console.log('Job complete, stopping polling:', { status: jobData.status, hasResults });
           setIsPolling(false);
+          isPollingRef.current = false;
+          // Clear any pending timeout
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+          }
           return;
         }
 
-        // Exponential backoff
-        delayRef.current = Math.min(
-          delayRef.current * BACKOFF_MULTIPLIER,
-          MAX_DELAY
+        // Only continue polling if job is still in progress and we're still supposed to poll
+        if (!isPollingRef.current || jobIdRef.current !== jobId) {
+          return;
+        }
+
+        // Use minimum 10 seconds delay
+        delayRef.current = Math.max(
+          INITIAL_DELAY,
+          Math.min(delayRef.current * BACKOFF_MULTIPLIER, MAX_DELAY)
         );
 
-        timeoutRef.current = setTimeout(poll, delayRef.current);
+        timeoutRef.current = setTimeout(() => {
+          // Double check before polling again
+          if (isPollingRef.current && jobIdRef.current === jobId) {
+            poll();
+          }
+        }, delayRef.current);
       } catch (err) {
+        // Check if jobId changed during async operation
+        if (jobIdRef.current !== jobId) {
+          return;
+        }
+        
         const error = err instanceof Error ? err : new Error('Unknown error');
         const status = (error as any).status;
         consecutiveErrorsRef.current += 1;
@@ -68,13 +141,32 @@ export function useJobPoll(jobId: string | null) {
 
         // Stop polling on 404 (job not found) or too many consecutive errors
         if (status === 404 || consecutiveErrorsRef.current >= MAX_CONSECUTIVE_ERRORS) {
+          console.log('Stopping polling due to error:', { status, consecutiveErrors: consecutiveErrorsRef.current });
           setIsPolling(false);
+          isPollingRef.current = false;
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+          }
           return;
         }
 
-        // Continue polling on other errors, but with longer delay
-        delayRef.current = Math.min(delayRef.current * BACKOFF_MULTIPLIER, MAX_DELAY);
-        timeoutRef.current = setTimeout(poll, delayRef.current);
+        // Only continue if we're still supposed to poll
+        if (!isPollingRef.current || jobIdRef.current !== jobId) {
+          return;
+        }
+
+        // Continue polling on other errors, but with minimum 10 seconds delay
+        delayRef.current = Math.max(
+          INITIAL_DELAY,
+          Math.min(delayRef.current * BACKOFF_MULTIPLIER, MAX_DELAY)
+        );
+        timeoutRef.current = setTimeout(() => {
+          // Double check before polling again
+          if (isPollingRef.current && jobIdRef.current === jobId) {
+            poll();
+          }
+        }, delayRef.current);
       }
     };
 
@@ -82,11 +174,13 @@ export function useJobPoll(jobId: string | null) {
     poll();
 
     return () => {
+      isPollingRef.current = false;
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
-  }, [jobId, getAuthToken]);
+  }, [jobId]); // Removed getAuthToken from dependencies
 
   return { job, isPolling, error };
 }

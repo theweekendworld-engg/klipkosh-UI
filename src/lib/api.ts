@@ -63,13 +63,38 @@ export const api = {
     }
 
     const data = await response.json();
+    
+    // Extract result from either 'output' or 'outputs' field
+    // The API may return output as an object with extra fields (id, job_id, generated_at)
+    // or as a direct object with just the content fields
+    const outputData = data.output || data.outputs;
+    let result = null;
+    
+    if (outputData) {
+      // If output has nested structure, extract just the content fields
+      if (outputData.description || outputData.tags || outputData.summary || outputData.social_caption) {
+        result = {
+          description: outputData.description || '',
+          tags: outputData.tags || [],
+          summary: outputData.summary || [],
+          social_caption: outputData.social_caption || '',
+          hashtags: outputData.hashtags || [],
+        };
+      } else {
+        // If it's already in the right format, use it as is
+        result = outputData;
+      }
+    }
+    
     return {
       id: data.job_id || data.id,
       status: data.status,
       created_at: data.created_at,
       updated_at: data.updated_at,
-      error: data.error,
-      result: data.outputs,
+      error: data.error_message || data.error,
+      result,
+      video_url: data.video_url,
+      video_id: data.video_id,
     };
   },
 
@@ -90,7 +115,18 @@ export const api = {
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? data : data.jobs || [];
+    const jobs = Array.isArray(data) ? data : data.jobs || [];
+    // Map jobs to include video_url and video_id
+    return jobs.map((job: any) => ({
+      id: job.job_id || job.id,
+      status: job.status,
+      created_at: job.created_at,
+      updated_at: job.updated_at,
+      error: job.error_message || job.error,
+      result: job.output || job.outputs,
+      video_url: job.video_url,
+      video_id: job.video_id,
+    }));
   },
 
   async getUsageStats(token?: string): Promise<UsageStats> {
