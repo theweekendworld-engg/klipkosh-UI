@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { Landing } from '@/pages/Landing';
 import { Dashboard } from '@/pages/Dashboard';
+import { Pricing } from '@/pages/Pricing';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
@@ -40,6 +41,7 @@ function App() {
                 }
               />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Toaster />
