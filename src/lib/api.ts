@@ -4,19 +4,25 @@ import type {
   UsageStats,
   UserPreferences,
 } from './types';
+import { ApiError } from './apiError';
 
 const API_URL = import.meta.env.VITE_POST_PILOT_BE_URL || 'http://localhost:8080';
+
+function createHeaders(token?: string | null, existingHeaders?: HeadersInit): Headers {
+  const headers = new Headers(existingHeaders);
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+  headers.set('Content-Type', 'application/json');
+  return headers;
+}
 
 async function fetchWithAuth(
   url: string,
   options: RequestInit = {},
   token?: string | null
 ): Promise<Response> {
-  const headers = new Headers(options.headers);
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
-  headers.set('Content-Type', 'application/json');
+  const headers = createHeaders(token, options.headers);
 
   return fetch(`${API_URL}${url}`, {
     ...options,
@@ -36,29 +42,23 @@ export const api = {
     );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     return response.json();
   },
 
   async getJob(jobId: string, token?: string): Promise<Job> {
-    const headers = new Headers();
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    headers.set('Content-Type', 'application/json');
+    const headers = createHeaders(token);
 
     const response = await fetch(`${API_URL}/api/v1/jobs/${jobId}`, {
       headers,
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      const apiError = new Error(error.message || `HTTP ${response.status}`);
-      (apiError as any).status = response.status;
-      throw apiError;
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     const data = await response.json();
@@ -98,19 +98,15 @@ export const api = {
   },
 
   async getRecentJobs(token?: string): Promise<Job[]> {
-    const headers = new Headers();
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    headers.set('Content-Type', 'application/json');
+    const headers = createHeaders(token);
 
     const response = await fetch(`${API_URL}/api/v1/jobs`, {
       headers,
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     const data = await response.json();
@@ -129,19 +125,15 @@ export const api = {
   },
 
   async getUsageStats(token?: string): Promise<UsageStats> {
-    const headers = new Headers();
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    headers.set('Content-Type', 'application/json');
+    const headers = createHeaders(token);
 
     const response = await fetch(`${API_URL}/api/v1/usage`, {
       headers,
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     return response.json();
@@ -151,10 +143,9 @@ export const api = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const headers = new Headers();
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
+    const headers = createHeaders(token);
+    // Remove Content-Type for FormData - browser will set it with boundary
+    headers.delete('Content-Type');
 
     const response = await fetch(`${API_URL}/api/v1/upload-transcript`, {
       method: 'POST',
@@ -163,19 +154,15 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
 
     return response.json();
   },
 
   async savePreferences(preferences: UserPreferences, token?: string): Promise<void> {
-    const headers = new Headers();
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    headers.set('Content-Type', 'application/json');
+    const headers = createHeaders(token);
 
     const response = await fetch(`${API_URL}/api/v1/preferences`, {
       method: 'POST',
@@ -184,8 +171,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw ApiError.fromResponse(response.status, errorData);
     }
   },
 };
