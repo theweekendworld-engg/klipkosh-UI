@@ -31,7 +31,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
 
   useEffect(() => {
     // Load saved preferences from localStorage
-    const saved = localStorage.getItem('postpilot_preferences');
+    const saved = localStorage.getItem('klipkosh_preferences');
     if (saved) {
       try {
         const prefs: UserPreferences = JSON.parse(saved);
@@ -56,7 +56,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
       };
 
       // Save locally
-      localStorage.setItem('postpilot_preferences', JSON.stringify(preferences));
+      localStorage.setItem('klipkosh_preferences', JSON.stringify(preferences));
 
       // Try to save to backend if user has premium
       try {
