@@ -31,10 +31,10 @@ export function Landing() {
         <div className="mx-auto flex max-w-[980px] flex-col items-center gap-6 text-center">
           <h1 className="text-4xl font-bold leading-tight tracking-tighter md:text-6xl lg:leading-[1.1]">
             Free{' '}
-            <span className="bg-gradient-to-r from-pink-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-              YouTube Transcript
+            <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+              AI YouTube Content
             </span>{' '}
-            Generator
+            Generation
           </h1>
           <p className="max-w-[750px] text-lg text-white/90 sm:text-xl font-light">
             Instantly, without uploading video files.
@@ -51,19 +51,25 @@ export function Landing() {
                     handleGetTranscript();
                   }
                 }}
-                className="flex-1 h-14 px-6 rounded-xl bg-white/10 border border-purple-300/30 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-base"
+                className="flex-1 h-14 px-6 rounded-xl bg-white/10 border border-purple-300/30 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400/50 text-base"
               />
               {isSignedIn ? (
                 <button
                   onClick={handleGetTranscript}
-                  className="h-14 px-8 rounded-xl bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 text-white font-semibold hover:from-purple-500 hover:via-purple-400 hover:to-pink-400 transition-all shadow-lg hover:shadow-xl text-base whitespace-nowrap"
+                  className="h-14 px-8 rounded-xl bg-gradient-to-r from-purple-600/90 via-pink-500/90 to-blue-500/90 text-white font-semibold hover:from-purple-500/90 hover:via-pink-400/90 hover:to-blue-400/90 transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-purple-500/20 text-base whitespace-nowrap group"
                 >
-                  Get Video Transcript
+                  <span className="flex items-center gap-2">
+                    Get Video Transcript
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  </span>
                 </button>
               ) : (
                 <SignInButton mode="modal">
-                  <button className="h-14 px-8 rounded-xl bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 text-white font-semibold hover:from-purple-500 hover:via-purple-400 hover:to-pink-400 transition-all shadow-lg hover:shadow-xl text-base whitespace-nowrap">
-                    Get Video Transcript
+                  <button className="h-14 px-8 rounded-xl bg-gradient-to-r from-purple-600/90 via-purple-500/90 to-pink-500/90 text-white font-semibold hover:from-purple-500/90 hover:via-purple-400/90 hover:to-pink-400/90 transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-purple-500/20 text-base whitespace-nowrap group">
+                    <span className="flex items-center gap-2">
+                      Get Video Transcript
+                      <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                    </span>
                   </button>
                 </SignInButton>
               )}
@@ -76,7 +82,7 @@ export function Landing() {
       {/* Features Section */}
       <section className="container py-12 md:py-24 px-4">
         <div className="mx-auto grid max-w-[1200px] gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm hover:bg-white/10 transition-all">
+          <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm hover:border-pink-300/40 hover:bg-white/10 transition-all">
             <CardHeader>
               <Sparkles className="mb-2 h-8 w-8 text-pink-400" />
               <CardTitle className="text-xl text-white">AI-Powered Generation</CardTitle>
@@ -86,18 +92,18 @@ export function Landing() {
               </CardDescription>
             </CardHeader>
           </Card>
-          <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm hover:bg-white/10 transition-all">
+          <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm hover:border-pink-300/40 hover:bg-white/10 transition-all">
             <CardHeader>
-              <Zap className="mb-2 h-8 w-8 text-pink-400" />
+              <Zap className="mb-2 h-8 w-8 text-purple-400" />
               <CardTitle className="text-xl text-white">Lightning Fast</CardTitle>
               <CardDescription className="text-base text-white/70">
                 Get your content generated in minutes. No more spending hours writing descriptions.
               </CardDescription>
             </CardHeader>
           </Card>
-          <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm hover:bg-white/10 transition-all">
+          <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm hover:border-pink-300/40 hover:bg-white/10 transition-all">
             <CardHeader>
-              <Shield className="mb-2 h-8 w-8 text-pink-400" />
+              <Shield className="mb-2 h-8 w-8 text-blue-400" />
               <CardTitle className="text-xl text-white">Secure & Private</CardTitle>
               <CardDescription className="text-base text-white/70">
                 Your content is processed securely. We never share your data with third parties.
@@ -115,8 +121,14 @@ export function Landing() {
             Sign in to start generating content for your YouTube videos today.
           </p>
           <SignInButton mode="modal">
-            <button className="h-12 px-8 rounded-xl bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 text-white font-semibold hover:from-purple-500 hover:via-purple-400 hover:to-pink-400 transition-all shadow-lg hover:shadow-xl text-base">
-              Sign In to Get Started <ArrowRight className="inline h-5 w-5 ml-2" />
+            <button 
+              type="button"
+              className="h-12 px-8 rounded-xl bg-gradient-to-r from-purple-600/90 via-pink-500/90 to-blue-500/90 text-white font-semibold hover:from-purple-500/90 hover:via-pink-400/90 hover:to-blue-400/90 transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-purple-500/20 text-base group"
+            >
+              <span className="flex items-center gap-2">
+                Sign In to Get Started
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+              </span>
             </button>
           </SignInButton>
         </div>

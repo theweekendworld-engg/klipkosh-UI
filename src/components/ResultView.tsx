@@ -3,6 +3,7 @@ import { Copy, Download, ExternalLink, Check } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/useToast';
+import { extractYouTubeVideoId } from '@/utils/validation';
 import type { Job } from '@/lib/types';
 
 interface ResultViewProps {
@@ -72,15 +73,54 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
     }
   };
 
+  const videoId = youtubeUrl ? extractYouTubeVideoId(youtubeUrl) : null;
+  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+
   return (
     <div className="space-y-6">
-      {/* Description Card */}
+      {/* YouTube Video Preview */}
+      {embedUrl && (
+        <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10 hover:shadow-xl hover:shadow-purple-500/20 transition-all relative overflow-hidden group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+          <CardHeader className="relative z-10">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Video Preview</CardTitle>
+                <CardDescription className="text-white/70">YouTube video preview</CardDescription>
+              </div>
+              {youtubeUrl && (
+                <Button variant="outline" size="sm" onClick={openYouTube} className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Open on YouTube
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src={embedUrl}
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute top-0 left-0 w-full h-full rounded-lg border border-purple-300/20"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Description Card - Full Width */}
       {description && (
-      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
-        <CardHeader>
+      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10 hover:shadow-xl hover:shadow-purple-500/20 transition-all relative overflow-hidden group">
+        {/* Animated gradient line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        <CardHeader className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-white">Description</CardTitle>
+              <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Description</CardTitle>
               <CardDescription className="text-white/70">Video description ready for YouTube</CardDescription>
             </div>
             <div className="flex gap-2">
@@ -88,6 +128,7 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => copyToClipboard(description, 'Description')}
+                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
               >
                 {copied === 'Description' ? (
                   <>
@@ -105,12 +146,13 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => downloadMarkdown(description, 'description.md')}
+                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
               >
                 <Download className="mr-2 h-4 w-4" />
                 Download
               </Button>
               {youtubeUrl && (
-                <Button variant="outline" size="sm" onClick={openYouTube}>
+                <Button variant="outline" size="sm" onClick={openYouTube} className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   YouTube
                 </Button>
@@ -118,25 +160,30 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <p 
-            className="whitespace-pre-wrap text-sm text-white/90 cursor-pointer hover:bg-white/10 p-2 rounded transition-colors"
+        <CardContent className="relative z-10">
+          <div 
+            className="whitespace-pre-wrap text-sm text-white/90 cursor-pointer hover:bg-gradient-to-r hover:from-pink-500/10 hover:via-purple-500/10 hover:to-blue-500/10 p-4 rounded-lg transition-all border border-transparent hover:border-pink-300/20 max-h-64 overflow-y-auto"
             onClick={() => copyToClipboard(description, 'Description')}
             title="Click to copy description"
           >
             {description}
-          </p>
+          </div>
         </CardContent>
       </Card>
       )}
 
+      {/* Results Grid - More Horizontal Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Tags Card */}
       {tags.length > 0 && (
-      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
-        <CardHeader>
+      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-purple-500/10 hover:shadow-xl hover:shadow-pink-500/20 transition-all relative overflow-hidden group">
+        {/* Animated gradient line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        <CardHeader className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-white">Tags</CardTitle>
+              <CardTitle className="text-white bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Tags</CardTitle>
               <CardDescription className="text-white/70">Suggested tags for your video</CardDescription>
             </div>
             <div className="flex gap-2">
@@ -144,6 +191,7 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => copyToClipboard(tags.join(', '), 'Tags')}
+                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
               >
                 {copied === 'Tags' ? (
                   <>
@@ -160,12 +208,12 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
               <span
                 key={index}
-                className="rounded-md bg-secondary px-2 py-1 text-xs font-medium cursor-pointer hover:bg-secondary/80 transition-colors"
+                className="rounded-lg bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 border border-purple-300/30 px-3 py-1.5 text-xs font-medium cursor-pointer hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 hover:border-pink-300/50 hover:shadow-lg hover:shadow-pink-500/20 transition-all text-white/90"
                 onClick={() => copyToClipboard(tag, `Tag: ${tag}`)}
                 title="Click to copy"
               >
@@ -179,17 +227,21 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
 
       {/* Summary Card */}
       {summary.length > 0 && (
-      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
-        <CardHeader>
+      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10 hover:shadow-xl hover:shadow-purple-500/20 transition-all relative overflow-hidden group">
+        {/* Animated gradient line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        <CardHeader className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-white">Summary</CardTitle>
+              <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Summary</CardTitle>
               <CardDescription className="text-white/70">Key points and notes</CardDescription>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => copyToClipboard(summary.join('\n'), 'Summary')}
+              className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
             >
               {copied === 'Summary' ? (
                 <>
@@ -205,18 +257,18 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
+        <CardContent className="relative z-10">
+          <ul className="space-y-3">
             {summary.map((item, index) => (
               <li 
                 key={index} 
-                className="flex items-start gap-2 text-sm text-white/90 cursor-pointer hover:bg-white/10 p-2 rounded transition-colors group"
+                className="flex items-start gap-3 text-sm text-white/90 cursor-pointer hover:bg-gradient-to-r hover:from-pink-500/10 hover:via-purple-500/10 hover:to-blue-500/10 p-3 rounded-lg transition-all border border-transparent hover:border-pink-300/20 group relative"
                 onClick={() => copyToClipboard(item, `Summary point ${index + 1}`)}
                 title="Click to copy"
               >
-                <span className="mt-1 text-pink-400">•</span>
+                <span className="mt-1 text-pink-400 text-lg font-bold drop-shadow-lg">•</span>
                 <span className="flex-1 text-white/90">{item}</span>
-                <Copy className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+                <Copy className="h-3.5 w-3.5 opacity-0 group-hover:opacity-70 transition-opacity text-purple-300" />
               </li>
             ))}
           </ul>
@@ -226,11 +278,14 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
 
       {/* Social Caption Card */}
       {social_caption && (
-      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
-        <CardHeader>
+      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-purple-500/10 hover:shadow-xl hover:shadow-pink-500/20 transition-all relative overflow-hidden group">
+        {/* Animated gradient line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        <CardHeader className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-white">Social Caption</CardTitle>
+              <CardTitle className="text-white bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Social Caption</CardTitle>
               <CardDescription className="text-white/70">Ready-to-post social media caption</CardDescription>
             </div>
             <div className="flex gap-2">
@@ -238,6 +293,7 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => copyToClipboard(social_caption, 'Social Caption')}
+                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
               >
                 {copied === 'Social Caption' ? (
                   <>
@@ -256,6 +312,7 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => copyToClipboard(hashtags.map(h => `#${h}`).join(' '), 'Hashtags')}
+                  className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
                 >
                   {copied === 'Hashtags' ? (
                     <>
@@ -273,20 +330,20 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <p 
-            className="whitespace-pre-wrap text-sm text-white/90 cursor-pointer hover:bg-white/10 p-2 rounded transition-colors"
+        <CardContent className="relative z-10">
+          <div 
+            className="whitespace-pre-wrap text-sm text-white/90 cursor-pointer hover:bg-gradient-to-r hover:from-pink-500/10 hover:via-purple-500/10 hover:to-blue-500/10 p-4 rounded-lg transition-all border border-transparent hover:border-pink-300/20 max-h-48 overflow-y-auto"
             onClick={() => copyToClipboard(social_caption, 'Social Caption')}
             title="Click to copy caption"
           >
             {social_caption}
-          </p>
+          </div>
           {hashtags && hashtags.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               {hashtags.map((hashtag, index) => (
                 <span 
                   key={index} 
-                  className="text-xs text-pink-400 cursor-pointer hover:bg-white/10 px-2 py-1 rounded transition-colors"
+                  className="text-xs bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 border border-purple-300/30 text-pink-300 cursor-pointer hover:from-pink-500/30 hover:via-purple-500/30 hover:to-blue-500/30 hover:border-pink-300/50 hover:shadow-lg hover:shadow-pink-500/20 px-3 py-1.5 rounded-lg transition-all font-medium"
                   onClick={() => copyToClipboard(`#${hashtag}`, `Hashtag: #${hashtag}`)}
                   title="Click to copy"
                 >
@@ -298,6 +355,7 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
         </CardContent>
       </Card>
       )}
+      </div>
     </div>
   );
 }

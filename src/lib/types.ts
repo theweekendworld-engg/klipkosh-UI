@@ -43,7 +43,6 @@ export interface UserPreferences {
   default_model: string;
   default_tone: Tone;
   web_origin?: string;
-  allowed_callback?: string;
 }
 
 export interface UsageStats {

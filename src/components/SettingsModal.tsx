@@ -24,21 +24,19 @@ interface SettingsModalProps {
 export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   const { getAuthToken } = useAuth();
   const { toast } = useToast();
-  const [provider, setProvider] = useState<Provider>('openrouter');
-  const [model, setModel] = useState<string>('openai/gpt-4-turbo-preview');
+  const [provider, setProvider] = useState<Provider>('openai');
+  const [model, setModel] = useState<string>('gpt-5-nano');
   const [webOrigin, setWebOrigin] = useState<string>('');
-  const [allowedCallback, setAllowedCallback] = useState<string>('');
 
   useEffect(() => {
     // Load saved preferences from localStorage
-    const saved = localStorage.getItem('postpilot_preferences');
+    const saved = localStorage.getItem('klipkosh_preferences');
     if (saved) {
       try {
         const prefs: UserPreferences = JSON.parse(saved);
-        setProvider(prefs.provider || 'openrouter');
-        setModel(prefs.default_model || 'openai/gpt-4-turbo-preview');
+        setProvider(prefs.provider || 'openai');
+        setModel(prefs.default_model || 'gpt-5-nano');
         setWebOrigin(prefs.web_origin || '');
-        setAllowedCallback(prefs.allowed_callback || '');
       } catch (error) {
         console.error('Failed to load preferences:', error);
       }
@@ -52,11 +50,10 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
         default_model: model,
         default_tone: 'professional',
         web_origin: webOrigin || undefined,
-        allowed_callback: allowedCallback || undefined,
       };
 
       // Save locally
-      localStorage.setItem('postpilot_preferences', JSON.stringify(preferences));
+      localStorage.setItem('klipkosh_preferences', JSON.stringify(preferences));
 
       // Try to save to backend if user has premium
       try {
@@ -105,15 +102,6 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
               value={webOrigin}
               onChange={(e) => setWebOrigin(e.target.value)}
               placeholder="https://example.com"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="allowed-callback">Allowed Callback (Optional)</Label>
-            <Input
-              id="allowed-callback"
-              value={allowedCallback}
-              onChange={(e) => setAllowedCallback(e.target.value)}
-              placeholder="https://example.com/callback"
             />
           </div>
         </div>
