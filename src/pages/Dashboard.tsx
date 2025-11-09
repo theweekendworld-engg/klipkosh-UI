@@ -18,8 +18,8 @@ import { ProviderSelector } from '@/components/ProviderSelector';
 import type { GenerateRequest, Tone, Provider } from '@/lib/types';
 import { Header } from '@/components/Header';
 import { SettingsModal } from '@/components/SettingsModal';
-import { Pricing } from '@/components/Pricing';
 import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ export function Dashboard() {
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'generate' | 'results' | 'history' | 'pricing'>('generate');
+  const [activeTab, setActiveTab] = useState<'generate' | 'results' | 'history'>('generate');
 
   // Handle URL passed from landing page
   useEffect(() => {
@@ -233,16 +233,12 @@ export function Dashboard() {
               >
                 Results
               </button>
-              <button
-                onClick={() => setActiveTab('pricing')}
-                className={`px-4 py-3 text-sm font-medium transition-colors ${
-                  activeTab === 'pricing'
-                    ? 'text-white border-b-2 border-b-pink-400'
-                    : 'text-white/60 hover:text-white'
-                }`}
+              <Link
+                to="/pricing"
+                className="px-4 py-3 text-sm font-medium transition-colors text-white/60 hover:text-white"
               >
                 Pricing
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -360,12 +356,6 @@ export function Dashboard() {
                     </Card>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeTab === 'pricing' && (
-              <div className="flex-1 overflow-y-auto">
-                <Pricing />
               </div>
             )}
 

@@ -37,6 +37,9 @@ export function Header({ onSettingsClick }: HeaderProps) {
           <Link to="/">
             <Button variant="ghost" className="text-white hover:text-white hover:bg-white/10">Home</Button>
           </Link>
+          <Link to="/pricing">
+            <Button variant="ghost" className="text-white hover:text-white hover:bg-white/10">Pricing</Button>
+          </Link>
           {isSignedIn && (
             <>
               <Link to="/dashboard">
