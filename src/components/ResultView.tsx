@@ -84,15 +84,16 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse"></div>
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
           <CardHeader className="relative z-10">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div>
-                <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Video Preview</CardTitle>
-                <CardDescription className="text-white/70">YouTube video preview</CardDescription>
+                <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent text-base sm:text-lg">Video Preview</CardTitle>
+                <CardDescription className="text-white/70 text-xs sm:text-sm">YouTube video preview</CardDescription>
               </div>
               {youtubeUrl && (
-                <Button variant="outline" size="sm" onClick={openYouTube} className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Open on YouTube
+                <Button variant="outline" size="sm" onClick={openYouTube} className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9">
+                  <ExternalLink className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Open on YouTube</span>
+                  <span className="sm:hidden">YouTube</span>
                 </Button>
               )}
             </div>
@@ -118,27 +119,29 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse"></div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
         <CardHeader className="relative z-10">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <div>
-              <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Description</CardTitle>
-              <CardDescription className="text-white/70">Video description ready for YouTube</CardDescription>
+              <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent text-base sm:text-lg">Description</CardTitle>
+              <CardDescription className="text-white/70 text-xs sm:text-sm">Video description ready for YouTube</CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => copyToClipboard(description, 'Description')}
-                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
+                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
               >
                 {copied === 'Description' ? (
                   <>
-                    <Check className="mr-2 h-4 w-4" />
-                    Copied!
+                    <Check className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Copied!</span>
+                    <span className="sm:hidden">✓</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy
+                    <Copy className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Copy</span>
+                    <span className="sm:hidden">Copy</span>
                   </>
                 )}
               </Button>
@@ -146,15 +149,17 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => downloadMarkdown(description, 'description.md')}
-                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
+                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
               >
-                <Download className="mr-2 h-4 w-4" />
-                Download
+                <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Download</span>
+                <span className="sm:hidden">DL</span>
               </Button>
               {youtubeUrl && (
-                <Button variant="outline" size="sm" onClick={openYouTube} className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  YouTube
+                <Button variant="outline" size="sm" onClick={openYouTube} className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9">
+                  <ExternalLink className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">YouTube</span>
+                  <span className="sm:hidden">YT</span>
                 </Button>
               )}
             </div>
@@ -181,27 +186,29 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse"></div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
         <CardHeader className="relative z-10">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <div>
-              <CardTitle className="text-white bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Tags</CardTitle>
-              <CardDescription className="text-white/70">Suggested tags for your video</CardDescription>
+              <CardTitle className="text-white bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent text-base sm:text-lg">Tags</CardTitle>
+              <CardDescription className="text-white/70 text-xs sm:text-sm">Suggested tags for your video</CardDescription>
             </div>
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => copyToClipboard(tags.join(', '), 'Tags')}
-                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
+                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
               >
                 {copied === 'Tags' ? (
                   <>
-                    <Check className="mr-2 h-4 w-4" />
-                    Copied!
+                    <Check className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Copied!</span>
+                    <span className="sm:hidden">✓</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy All
+                    <Copy className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Copy All</span>
+                    <span className="sm:hidden">Copy</span>
                   </>
                 )}
               </Button>
@@ -232,26 +239,28 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse"></div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
         <CardHeader className="relative z-10">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <div>
-              <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Summary</CardTitle>
-              <CardDescription className="text-white/70">Key points and notes</CardDescription>
+              <CardTitle className="text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent text-base sm:text-lg">Summary</CardTitle>
+              <CardDescription className="text-white/70 text-xs sm:text-sm">Key points and notes</CardDescription>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => copyToClipboard(summary.join('\n'), 'Summary')}
-              className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
+              className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
             >
               {copied === 'Summary' ? (
                 <>
-                  <Check className="mr-2 h-4 w-4" />
-                  Copied!
+                  <Check className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Copied!</span>
+                  <span className="sm:hidden">✓</span>
                 </>
               ) : (
                 <>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copy
+                  <Copy className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Copy</span>
+                  <span className="sm:hidden">Copy</span>
                 </>
               )}
             </Button>
@@ -283,27 +292,29 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse"></div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
         <CardHeader className="relative z-10">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <div>
-              <CardTitle className="text-white bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Social Caption</CardTitle>
-              <CardDescription className="text-white/70">Ready-to-post social media caption</CardDescription>
+              <CardTitle className="text-white bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent text-base sm:text-lg">Social Caption</CardTitle>
+              <CardDescription className="text-white/70 text-xs sm:text-sm">Ready-to-post social media caption</CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => copyToClipboard(social_caption, 'Social Caption')}
-                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
+                className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
               >
                 {copied === 'Social Caption' ? (
                   <>
-                    <Check className="mr-2 h-4 w-4" />
-                    Copied!
+                    <Check className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Copied!</span>
+                    <span className="sm:hidden">✓</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy Caption
+                    <Copy className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Copy Caption</span>
+                    <span className="sm:hidden">Copy</span>
                   </>
                 )}
               </Button>
@@ -312,18 +323,20 @@ export function ResultView({ job, youtubeUrl }: ResultViewProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => copyToClipboard(hashtags.map(h => `#${h}`).join(' '), 'Hashtags')}
-                  className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all"
+                  className="border-purple-300/30 hover:border-pink-300/50 hover:bg-white/10 text-white transition-all text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
                 >
                   {copied === 'Hashtags' ? (
                     <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Copied!
+                      <Check className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Copied!</span>
+                      <span className="sm:hidden">✓</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="mr-2 h-4 w-4" />
-                      Copy Hashtags
-                    </>
+                      <Copy className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Copy Hashtags</span>
+                      <span className="sm:hidden">Tags</span>
+                  </>
                   )}
                 </Button>
               )}

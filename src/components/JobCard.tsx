@@ -32,17 +32,17 @@ export function JobCard({ job, onClick }: JobCardProps) {
     }
   };
 
-  // Truncate URL for display
+  // Truncate URL for display - shorter on mobile
   const displayUrl = videoUrl 
-    ? videoUrl.length > 50 
-      ? `${videoUrl.substring(0, 47)}...` 
+    ? videoUrl.length > 40 
+      ? `${videoUrl.substring(0, 37)}...` 
       : videoUrl
     : 'No URL';
 
   return (
     <div
       className={cn(
-        'p-3 rounded-lg border border-blue-300/20 bg-white/5 hover:bg-white/10 transition-all',
+        'p-2 sm:p-3 rounded-lg border border-blue-300/20 bg-white/5 hover:bg-white/10 transition-all',
         isClickable && 'cursor-pointer'
       )}
       onClick={isClickable ? onClick : undefined}
@@ -51,14 +51,14 @@ export function JobCard({ job, onClick }: JobCardProps) {
         {getStatusIcon()}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 group">
-            <p className="text-sm text-white/90 truncate">{displayUrl}</p>
+            <p className="text-xs sm:text-sm text-white/90 truncate">{displayUrl}</p>
             {videoUrl && (
               <button
                 onClick={handleVideoClick}
-                className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                className="opacity-70 sm:opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                 title="Open in YouTube"
               >
-                <ExternalLink className="h-3.5 w-3.5 text-blue-400" />
+                <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400" />
               </button>
             )}
           </div>

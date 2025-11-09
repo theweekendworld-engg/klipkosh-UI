@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { RefreshCw, Loader2, History, Sparkles, Settings as SettingsIcon } from 'lucide-react';
+import { RefreshCw, Loader2, History, Sparkles, Settings as SettingsIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,7 +19,6 @@ import type { GenerateRequest, Tone, Provider } from '@/lib/types';
 import { Header } from '@/components/Header';
 import { SettingsModal } from '@/components/SettingsModal';
 import { useAuth } from '@/hooks/useAuth';
-import { Link } from 'react-router-dom';
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -39,6 +38,14 @@ export function Dashboard() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'generate' | 'results' | 'history'>('generate');
+  // History drawer state: open by default on desktop, closed on mobile
+  const [historyDrawerOpen, setHistoryDrawerOpen] = useState(() => {
+    // Check if we're on mobile (window width < 768px)
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768;
+    }
+    return true; // Default to open for SSR
+  });
 
   // Handle URL passed from landing page
   useEffect(() => {
@@ -54,6 +61,21 @@ export function Dashboard() {
       navigate('/');
     }
   }, [isSignedIn, navigate]);
+
+  // Handle window resize to adjust drawer state
+  useEffect(() => {
+    const handleResize = () => {
+      // On mobile, close drawer; on desktop, open if there are jobs
+      if (window.innerWidth < 768) {
+        setHistoryDrawerOpen(false);
+      } else if (recentJobs.data && recentJobs.data.length > 0) {
+        setHistoryDrawerOpen(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [recentJobs.data]);
 
   // Load preferences from localStorage
   useEffect(() => {
@@ -79,6 +101,17 @@ export function Dashboard() {
       setActiveTab('results');
     }
   }, [currentJob]);
+
+  // Auto-select latest job when results tab is opened and no job is selected
+  useEffect(() => {
+    if (activeTab === 'results' && !currentJob && !selectedJob && recentJobs.data && recentJobs.data.length > 0) {
+      // Get the latest job (first in the array, assuming sorted by most recent)
+      const latestJob = recentJobs.data[0];
+      if (latestJob) {
+        setSelectedJob(latestJob.id);
+      }
+    }
+  }, [activeTab, currentJob, selectedJob, recentJobs.data]);
 
   const handleGenerate = async () => {
     if (!youtubeUrl.trim()) {
@@ -132,17 +165,48 @@ export function Dashboard() {
     <div className="min-h-screen flex flex-col">
       <Header onSettingsClick={() => setSettingsOpen(true)} />
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Left Sidebar - History (Desktop) */}
+        {/* History Drawer Toggle Button (when drawer is closed) */}
+        {recentJobs.data && recentJobs.data.length > 0 && !historyDrawerOpen && (
+          <button
+            onClick={() => setHistoryDrawerOpen(true)}
+            className="fixed bottom-6 right-6 md:left-2 md:top-24 md:bottom-auto z-30 h-14 w-14 md:h-12 md:w-12 rounded-full md:rounded-lg bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white shadow-lg hover:shadow-xl hover:shadow-pink-500/30 transition-all flex items-center justify-center group"
+            aria-label="Open History"
+          >
+            <History className="h-6 w-6 md:h-5 md:w-5 group-hover:scale-110 transition-transform" />
+            <span className="absolute -top-1 -right-1 h-4 w-4 bg-pink-500 rounded-full border-2 border-black/20 flex items-center justify-center text-[10px] font-bold">
+              {recentJobs.data.length}
+            </span>
+          </button>
+        )}
+
+        {/* History Drawer */}
         {recentJobs.data && recentJobs.data.length > 0 && (
           <>
-            <aside className="hidden md:flex flex-col w-64 border-r border-blue-300/20 bg-black/40 backdrop-blur-sm">
-              <div className="p-4 border-b border-blue-300/20">
+            {/* Desktop Drawer */}
+            <aside
+              className={`hidden md:flex flex-col border-r border-blue-300/20 bg-black/40 backdrop-blur-sm transition-all duration-300 ease-in-out ${
+                historyDrawerOpen ? 'w-72' : 'w-0 overflow-hidden'
+              }`}
+            >
+              <div className="p-4 border-b border-blue-300/20 flex items-center justify-between min-w-[288px] bg-gradient-to-r from-purple-500/10 to-pink-500/10">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <History className="h-5 w-5" />
+                  <History className="h-5 w-5 text-pink-400" />
                   History
+                  {recentJobs.data && (
+                    <span className="ml-2 px-2 py-0.5 rounded-full bg-pink-500/20 text-xs text-pink-300 font-medium">
+                      {recentJobs.data.length}
+                    </span>
+                  )}
                 </h2>
+                <button
+                  onClick={() => setHistoryDrawerOpen(false)}
+                  className="text-white/70 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10"
+                  aria-label="Close History"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 min-w-[288px]">
                 {recentJobs.data.map((job) => (
                   <JobCard
                     key={job.id}
@@ -157,38 +221,35 @@ export function Dashboard() {
               </div>
             </aside>
 
-            {/* Mobile History Button */}
-            <button
-              onClick={() => setActiveTab('history')}
-              className="md:hidden fixed bottom-6 left-6 z-40 h-14 w-14 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
-              aria-label="Open History"
-            >
-              <History className="h-6 w-6" />
-            </button>
-
-            {/* Mobile History Overlay */}
-            {activeTab === 'history' && (
+            {/* Mobile Drawer Overlay */}
+            {historyDrawerOpen && (
               <div
-                className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
-                onClick={() => setActiveTab('generate')}
+                className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm transition-opacity"
+                onClick={() => setHistoryDrawerOpen(false)}
               >
                 <div
-                  className="absolute left-0 top-0 bottom-0 w-full max-w-xs bg-black/95 backdrop-blur-md shadow-xl"
+                  className="absolute right-0 top-0 bottom-0 w-[85vw] max-w-sm bg-black/95 backdrop-blur-md shadow-xl transform transition-transform"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="p-4 border-b border-blue-300/20 flex items-center justify-between">
+                  <div className="p-4 border-b border-blue-300/20 flex items-center justify-between bg-gradient-to-r from-purple-500/10 to-pink-500/10">
                     <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                      <History className="h-5 w-5" />
+                      <History className="h-5 w-5 text-pink-400" />
                       History
+                      {recentJobs.data && (
+                        <span className="ml-2 px-2 py-0.5 rounded-full bg-pink-500/20 text-xs text-pink-300 font-medium">
+                          {recentJobs.data.length}
+                        </span>
+                      )}
                     </h2>
                     <button
-                      onClick={() => setActiveTab('generate')}
-                      className="text-white/70 hover:text-white transition-colors"
+                      onClick={() => setHistoryDrawerOpen(false)}
+                      className="text-white/70 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10"
+                      aria-label="Close History"
                     >
-                      ×
+                      <X className="h-5 w-5" />
                     </button>
                   </div>
-                  <div className="flex-1 overflow-y-auto p-3 space-y-2 h-[calc(100vh-73px)]">
+                  <div className="flex-1 overflow-y-auto p-4 space-y-3 h-[calc(100vh-73px)]">
                     {recentJobs.data.map((job) => (
                       <JobCard
                         key={job.id}
@@ -197,6 +258,7 @@ export function Dashboard() {
                           setSelectedJob(job.id);
                           setCurrentJobId(null);
                           setActiveTab('results');
+                          setHistoryDrawerOpen(false); // Close drawer on mobile when selecting a job
                         }}
                       />
                     ))}
@@ -211,21 +273,21 @@ export function Dashboard() {
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Tabs */}
           <div className="border-b border-purple-300/20 bg-black/20 backdrop-blur-sm">
-            <div className="container flex items-center gap-1 px-4">
+            <div className="container flex items-center gap-0 sm:gap-1 px-2 sm:px-4 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('generate')}
-                className={`px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 sm:gap-2 whitespace-nowrap ${
                   activeTab === 'generate'
                     ? 'text-white border-b-2 border-b-pink-400'
                     : 'text-white/60 hover:text-white'
                 }`}
               >
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
                 Generate
               </button>
               <button
                 onClick={() => setActiveTab('results')}
-                className={`px-4 py-3 text-sm font-medium transition-colors ${
+                className={`px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'results'
                     ? 'text-white border-b-2 border-b-pink-400'
                     : 'text-white/60 hover:text-white'
@@ -233,33 +295,17 @@ export function Dashboard() {
               >
                 Results
               </button>
-              <Link
-                to="/pricing"
-                className="px-4 py-3 text-sm font-medium transition-colors text-white/60 hover:text-white"
-              >
-                Pricing
-              </Link>
             </div>
           </div>
 
-          {/* History Tab Content (Mobile) */}
-          {activeTab === 'history' && (
-            <div className="flex-1 overflow-y-auto">
-              <div className="container max-w-4xl py-8 px-4">
-                <div className="text-center py-12">
-                  <p className="text-white/70">Select a job from the sidebar</p>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Tab Content */}
           <div className="flex-1 overflow-y-auto">
             {activeTab === 'generate' && (
-              <div className="container max-w-4xl py-8 px-4">
-                <div className="grid lg:grid-cols-3 gap-6">
+              <div className="container max-w-4xl py-4 sm:py-6 md:py-8 px-3 sm:px-4">
+                <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
                   {/* Left Column - Form */}
-                  <div className="lg:col-span-2 space-y-6">
+                  <div className="lg:col-span-2 space-y-4 sm:space-y-6">
         <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
           <CardHeader className="pb-4">
                         <CardTitle className="text-xl font-semibold text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Generate Content</CardTitle>
@@ -312,12 +358,12 @@ export function Dashboard() {
             </button>
           </CardContent>
         </Card>
-                  </div>
+            </div>
 
                   {/* Right Column - Usage Stats */}
-          <div className="space-y-4">
+          <div className="space-y-4 sm:space-y-4">
                     {usageStats.data && (
-                    <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
+              <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-semibold text-white">Usage</CardTitle>
                       </CardHeader>
@@ -334,9 +380,9 @@ export function Dashboard() {
                             {usageStats.data.total_generations}
                           </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                    )}
+                </CardContent>
+              </Card>
+            )}
                     <Card className="bg-white/5 border border-pink-300/20 backdrop-blur-sm">
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-semibold text-white flex items-center gap-2">
@@ -356,11 +402,11 @@ export function Dashboard() {
                     </Card>
                   </div>
                 </div>
-              </div>
-            )}
+          </div>
+        )}
 
             {activeTab === 'results' && (
-              <div className="container max-w-4xl py-8 px-4 relative overflow-hidden">
+              <div className="container max-w-4xl py-4 sm:py-6 md:py-8 px-3 sm:px-4 relative overflow-hidden">
                 {/* Animated background lines */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                   <div className="absolute top-0 left-0 w-full h-full">
@@ -408,36 +454,36 @@ export function Dashboard() {
                   selectedJobData ? (
                     selectedJobData.status === 'completed' || selectedJobData.status === 'done' ? (
                       selectedJobData.result ? (
-                        <div className="space-y-6 relative z-10">
-                          <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
+                        <div className="space-y-4 sm:space-y-6 relative z-10">
+                          <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
+                            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
                               Results
                             </h2>
-                            <Button variant="outline" onClick={() => setSelectedJob(null)} className="text-white border-purple-300/30 hover:bg-white/10 hover:border-pink-300/50 transition-all">
-                              Close
-                            </Button>
-                          </div>
+                            <Button variant="outline" onClick={() => setSelectedJob(null)} className="text-white border-purple-300/30 hover:bg-white/10 hover:border-pink-300/50 transition-all text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-10">
+                Close
+              </Button>
+            </div>
                           <ResultView job={selectedJobData} youtubeUrl={selectedJobData.video_url} />
                         </div>
                       ) : (
                         <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10 relative z-10">
-                          <CardContent className="py-8 text-center">
+                    <CardContent className="py-8 text-center">
                             <Loader2 className="h-6 w-6 text-pink-400 animate-spin mx-auto mb-2" />
-                            <p className="text-white/70">Loading results...</p>
-                          </CardContent>
-                        </Card>
-                      )
-                    ) : (
+                      <p className="text-white/70">Loading results...</p>
+                    </CardContent>
+                  </Card>
+                )
+              ) : (
                       <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-purple-500/10 relative z-10">
-                        <CardContent className="py-8">
+                  <CardContent className="py-8">
                           <div className="flex items-center gap-2 justify-center">
                             <Loader2 className="h-5 w-5 text-pink-400 animate-spin" />
                             <p className="text-white">Processing...</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )
-                  ) : (
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            ) : (
                     <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10 relative z-10">
                       <CardContent className="py-8 text-center">
                         <Loader2 className="h-6 w-6 text-pink-400 animate-spin mx-auto mb-2" />
@@ -445,28 +491,43 @@ export function Dashboard() {
                       </CardContent>
                     </Card>
                   )
-                ) : currentJob && (currentJob.status === 'completed' || currentJob.status === 'done') ? (
-                  // Current job results
-                  <div className="space-y-6 relative z-10">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
-                        Results
-                      </h2>
-                      <Button variant="outline" onClick={handleRegenerate} className="text-white border-purple-300/30 hover:bg-white/10 hover:border-pink-300/50 transition-all">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Regenerate
-              </Button>
-            </div>
-            {currentJob.result ? (
-              <ResultView job={currentJob} youtubeUrl={youtubeUrl || undefined} />
-            ) : (
-                      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10">
+                ) : currentJob ? (
+                  // Current job - check status
+                  currentJob.status === 'completed' || currentJob.status === 'done' ? (
+                    // Current job results
+                    <div className="space-y-4 sm:space-y-6 relative z-10">
+                      <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
+                          Results
+                        </h2>
+                        <Button variant="outline" onClick={handleRegenerate} className="text-white border-purple-300/30 hover:bg-white/10 hover:border-pink-300/50 transition-all text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-10">
+                          <RefreshCw className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">Regenerate</span>
+                          <span className="sm:hidden">Regen</span>
+                        </Button>
+                      </div>
+                      {currentJob.result ? (
+                        <ResultView job={currentJob} youtubeUrl={youtubeUrl || undefined} />
+                      ) : (
+                        <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10">
                 <CardContent className="py-8 text-center">
-                  <p className="text-white/70">Loading results...</p>
+                            <Loader2 className="h-6 w-6 text-pink-400 animate-spin mx-auto mb-2" />
+                            <p className="text-white/70">Loading results...</p>
                 </CardContent>
               </Card>
             )}
           </div>
+                  ) : (
+                    // Current job is processing
+                    <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-purple-500/10 relative z-10">
+                      <CardContent className="py-8">
+                        <div className="flex items-center gap-2 justify-center">
+                          <Loader2 className="h-5 w-5 text-pink-400 animate-spin" />
+                          <p className="text-white">Processing...</p>
+                        </div>
+            </CardContent>
+          </Card>
+                  )
                 ) : (
                   // No results
                   <div className="text-center py-12 relative z-10">

@@ -60,19 +60,19 @@ export function Pricing() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-1">
-        <div className="container max-w-6xl py-16 px-4">
+        <div className="container max-w-6xl py-8 sm:py-12 md:py-16 px-3 sm:px-4">
           {/* Header Section */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16 px-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-white">
               Simple, Transparent Pricing
             </h1>
-            <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto">
               Choose the plan that works best for you. All plans include our AI-powered YouTube content generation.
             </p>
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 md:mb-16">
             {plans.map((plan) => (
               <Card
                 key={plan.name}
@@ -84,28 +84,28 @@ export function Pricing() {
               >
                 {plan.popular && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <span className="px-4 py-1 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-semibold">
+                    <span className="px-3 sm:px-4 py-0.5 sm:py-1 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-semibold">
                       Most Popular
                     </span>
                   </div>
                 )}
 
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-2xl text-white mb-2">{plan.name}</CardTitle>
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-5xl font-bold text-white">{plan.price}</span>
+                <CardHeader className="pb-4 sm:pb-6">
+                  <CardTitle className="text-xl sm:text-2xl text-white mb-2">{plan.name}</CardTitle>
+                  <div className="flex items-baseline gap-2 mb-3 sm:mb-4">
+                    <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">{plan.price}</span>
                     {plan.price !== '$0' && (
-                      <span className="text-white/60 text-base">/month</span>
+                      <span className="text-white/60 text-sm sm:text-base">/month</span>
                     )}
                   </div>
-                  <CardDescription className="text-white/70 text-base">
+                  <CardDescription className="text-white/70 text-sm sm:text-base">
                     {plan.description}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 sm:space-y-6">
                   <Button
-                    className={`w-full h-12 rounded-lg font-semibold transition-all ${
+                    className={`w-full h-11 sm:h-12 rounded-lg font-semibold transition-all text-sm sm:text-base ${
                       plan.popular
                         ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-500 hover:to-pink-500'
                         : plan.price === '$0'
@@ -114,7 +114,7 @@ export function Pricing() {
                     }`}
                   >
                     {plan.price === '$0' ? 'Get Started' : 'Subscribe Now'}
-                    {plan.price !== '$0' && <ArrowRight className="ml-2 h-4 w-4" />}
+                    {plan.price !== '$0' && <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />}
                   </Button>
 
                   <div className="space-y-3 pt-4 border-t border-white/10">
@@ -136,7 +136,7 @@ export function Pricing() {
           </div>
 
           {/* Trust Indicators */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
             <Card className="bg-white/5 border border-white/10 backdrop-blur-sm">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 mb-2">
@@ -175,9 +175,9 @@ export function Pricing() {
           </div>
 
           {/* FAQ Section */}
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-8">
+          <div className="text-center px-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Frequently Asked Questions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto mt-6 sm:mt-8">
               <Card className="bg-white/5 border border-white/10 backdrop-blur-sm text-left">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold text-white mb-2">Can I change plans later?</h3>
