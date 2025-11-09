@@ -8,23 +8,12 @@ import { ApiError } from './apiError';
 
 const API_URL = import.meta.env.VITE_POST_PILOT_BE_URL || 'http://localhost:8080';
 
-function getOrigin(): string {
-  if (typeof window !== 'undefined') {
-    return window.location.origin;
-  }
-  return '';
-}
-
 function createHeaders(token?: string | null, existingHeaders?: HeadersInit): Headers {
   const headers = new Headers(existingHeaders);
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
   headers.set('Content-Type', 'application/json');
-  const origin = getOrigin();
-  if (origin) {
-    headers.set('Origin', origin);
-  }
   return headers;
 }
 
