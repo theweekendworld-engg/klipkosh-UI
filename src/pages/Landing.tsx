@@ -56,14 +56,20 @@ export function Landing() {
               {isSignedIn ? (
                 <button
                   onClick={handleGetTranscript}
-                  className="h-14 px-8 rounded-xl bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white font-semibold hover:from-purple-500 hover:via-pink-400 hover:to-blue-400 transition-all shadow-lg hover:shadow-xl text-base whitespace-nowrap"
+                  className="h-14 px-8 rounded-xl bg-gradient-to-r from-purple-600/90 via-pink-500/90 to-blue-500/90 text-white font-semibold hover:from-purple-500/90 hover:via-pink-400/90 hover:to-blue-400/90 transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-purple-500/20 text-base whitespace-nowrap group"
                 >
-                  Get Video Transcript
+                  <span className="flex items-center gap-2">
+                    Get Video Transcript
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  </span>
                 </button>
               ) : (
                 <SignInButton mode="modal">
-                  <button className="h-14 px-8 rounded-xl bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 text-white font-semibold hover:from-purple-500 hover:via-purple-400 hover:to-pink-400 transition-all shadow-lg hover:shadow-xl text-base whitespace-nowrap">
-                    Get Video Transcript
+                  <button className="h-14 px-8 rounded-xl bg-gradient-to-r from-purple-600/90 via-purple-500/90 to-pink-500/90 text-white font-semibold hover:from-purple-500/90 hover:via-purple-400/90 hover:to-pink-400/90 transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-purple-500/20 text-base whitespace-nowrap group">
+                    <span className="flex items-center gap-2">
+                      Get Video Transcript
+                      <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                    </span>
                   </button>
                 </SignInButton>
               )}
@@ -117,9 +123,12 @@ export function Landing() {
           <SignInButton mode="modal">
             <button 
               type="button"
-              className="h-12 px-8 rounded-xl bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white font-semibold hover:from-purple-500 hover:via-pink-400 hover:to-blue-400 transition-all shadow-lg hover:shadow-xl text-base"
+              className="h-12 px-8 rounded-xl bg-gradient-to-r from-purple-600/90 via-pink-500/90 to-blue-500/90 text-white font-semibold hover:from-purple-500/90 hover:via-pink-400/90 hover:to-blue-400/90 transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-purple-500/20 text-base group"
             >
-              Sign In to Get Started <ArrowRight className="inline h-5 w-5 ml-2" />
+              <span className="flex items-center gap-2">
+                Sign In to Get Started
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+              </span>
             </button>
           </SignInButton>
         </div>

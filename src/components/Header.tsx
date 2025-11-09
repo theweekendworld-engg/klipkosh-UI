@@ -20,13 +20,13 @@ export function Header({ onSettingsClick }: HeaderProps) {
           <span className="text-xs text-white/70 ml-1">theweekendworld</span>
         </div>
 
-        {/* Center - KlipKosh (Artistic) */}
+        {/* Center - KlipKosh (Artistic with Alternating Dim) */}
         <Link to="/" className="absolute left-1/2 -translate-x-1/2">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-blue-500 bg-clip-text text-transparent drop-shadow-lg">
+            <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-blue-500 bg-clip-text text-transparent drop-shadow-lg animate-alternate-dim">
               Klip
             </span>
-            <span className="bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
+            <span className="bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg animate-alternate-dim-delayed">
               Kosh
             </span>
           </h1>
@@ -34,6 +34,9 @@ export function Header({ onSettingsClick }: HeaderProps) {
 
         {/* Right side - Navigation */}
         <nav className="flex items-center space-x-4 ml-auto">
+          <Link to="/">
+            <Button variant="ghost" className="text-white hover:text-white hover:bg-white/10">Home</Button>
+          </Link>
           {isSignedIn && (
             <>
               <Link to="/dashboard">

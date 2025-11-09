@@ -18,6 +18,7 @@ import { ProviderSelector } from '@/components/ProviderSelector';
 import type { GenerateRequest, Tone, Provider } from '@/lib/types';
 import { Header } from '@/components/Header';
 import { SettingsModal } from '@/components/SettingsModal';
+import { Pricing } from '@/components/Pricing';
 import { useAuth } from '@/hooks/useAuth';
 
 export function Dashboard() {
@@ -32,12 +33,12 @@ export function Dashboard() {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [titleOverride, setTitleOverride] = useState('');
   const [tone, setTone] = useState<Tone>('professional');
-  const [provider, setProvider] = useState<Provider>('openrouter');
-  const [model, setModel] = useState<string>('openai/gpt-4-turbo-preview');
+  const [provider, setProvider] = useState<Provider>('openai');
+  const [model, setModel] = useState<string>('gpt-5-nano');
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'generate' | 'results' | 'history'>('generate');
+  const [activeTab, setActiveTab] = useState<'generate' | 'results' | 'history' | 'pricing'>('generate');
 
   // Handle URL passed from landing page
   useEffect(() => {
@@ -60,8 +61,8 @@ export function Dashboard() {
     if (saved) {
       try {
         const prefs = JSON.parse(saved);
-        setProvider(prefs.provider || 'openrouter');
-        setModel(prefs.default_model || 'openai/gpt-4-turbo-preview');
+        setProvider(prefs.provider || 'openai');
+        setModel(prefs.default_model || 'gpt-5-nano');
         setTone(prefs.default_tone || 'professional');
       } catch (error) {
         console.error('Failed to load preferences:', error);
@@ -232,6 +233,16 @@ export function Dashboard() {
               >
                 Results
               </button>
+              <button
+                onClick={() => setActiveTab('pricing')}
+                className={`px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'pricing'
+                    ? 'text-white border-b-2 border-b-pink-400'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                Pricing
+              </button>
             </div>
           </div>
 
@@ -253,62 +264,62 @@ export function Dashboard() {
                 <div className="grid lg:grid-cols-3 gap-6">
                   {/* Left Column - Form */}
                   <div className="lg:col-span-2 space-y-6">
-                    <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
-                      <CardHeader className="pb-4">
+        <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
+          <CardHeader className="pb-4">
                         <CardTitle className="text-xl font-semibold text-white bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Generate Content</CardTitle>
                         <CardDescription className="text-sm text-white/70">
-                          Paste a YouTube URL to generate descriptions, tags, and captions
-                        </CardDescription>
-                      </CardHeader>
+              Paste a YouTube URL to generate descriptions, tags, and captions
+            </CardDescription>
+          </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="youtube-url" className="text-white">YouTube URL</Label>
-                          <Input
-                            id="youtube-url"
-                            type="url"
-                            placeholder="Enter YouTube URL..."
-                            value={youtubeUrl}
-                            onChange={(e) => setYoutubeUrl(e.target.value)}
+            <div className="space-y-2">
+              <Label htmlFor="youtube-url" className="text-white">YouTube URL</Label>
+              <Input
+                id="youtube-url"
+                type="url"
+                placeholder="Enter YouTube URL..."
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
                             className="h-12 text-base bg-white/10 border-purple-300/30 text-white placeholder:text-white/60 focus:border-pink-400/50 focus:ring-pink-400/50"
-                          />
-                        </div>
+              />
+            </div>
 
-                        <div className="grid gap-4 sm:grid-cols-2">
-                          <div className="space-y-2">
-                            <Label htmlFor="title-override" className="text-white">Title Override (Optional)</Label>
-                            <Input
-                              id="title-override"
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="title-override" className="text-white">Title Override (Optional)</Label>
+                <Input
+                  id="title-override"
                               placeholder="Custom title"
-                              value={titleOverride}
-                              onChange={(e) => setTitleOverride(e.target.value)}
+                  value={titleOverride}
+                  onChange={(e) => setTitleOverride(e.target.value)}
                               className="bg-white/10 border-purple-300/30 text-white placeholder:text-white/60 focus:border-pink-400/50"
-                            />
-                          </div>
-                          <ToneSelector value={tone} onValueChange={setTone} />
-                        </div>
+                />
+              </div>
+              <ToneSelector value={tone} onValueChange={setTone} />
+            </div>
 
-                        <ProviderSelector value={provider} onValueChange={setProvider} model={model} onModelChange={setModel} />
+            <ProviderSelector value={provider} onValueChange={setProvider} model={model} onModelChange={setModel} />
 
-                        <button
-                          onClick={handleGenerate}
-                          disabled={!canGenerate || generateMutation.isPending || isPolling}
+            <button
+              onClick={handleGenerate}
+              disabled={!canGenerate || generateMutation.isPending || isPolling}
                           className="w-full h-12 rounded-xl bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white font-semibold hover:from-purple-500 hover:via-pink-400 hover:to-blue-400 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-base flex items-center justify-center"
-                        >
-                          {generateMutation.isPending || isPolling ? (
-                            <>
-                              <RefreshCw className="mr-2 h-5 w-5 animate-spin" />
-                              Generating...
-                            </>
-                          ) : (
+            >
+              {generateMutation.isPending || isPolling ? (
+                <>
+                  <RefreshCw className="mr-2 h-5 w-5 animate-spin" />
+                  Generating...
+                </>
+              ) : (
                             'Generate'
-                          )}
-                        </button>
-                      </CardContent>
-                    </Card>
+              )}
+            </button>
+          </CardContent>
+        </Card>
                   </div>
 
                   {/* Right Column - Usage Stats */}
-                  <div className="space-y-4">
+          <div className="space-y-4">
                     {usageStats.data && (
                     <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm">
                       <CardHeader className="pb-3">
@@ -352,72 +363,126 @@ export function Dashboard() {
               </div>
             )}
 
+            {activeTab === 'pricing' && (
+              <div className="flex-1 overflow-y-auto">
+                <Pricing />
+              </div>
+            )}
+
             {activeTab === 'results' && (
-              <div className="container max-w-4xl py-8 px-4">
+              <div className="container max-w-4xl py-8 px-4 relative overflow-hidden">
+                {/* Animated background lines */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  <div className="absolute top-0 left-0 w-full h-full">
+                    {/* Moving vertical lines */}
+                    <div className="absolute top-20 left-0 w-1 h-64 bg-gradient-to-b from-pink-500/20 via-purple-500/30 to-transparent animate-pulse"></div>
+                    <div className="absolute top-40 right-10 w-1 h-48 bg-gradient-to-b from-purple-500/20 via-pink-500/30 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                    <div className="absolute bottom-20 left-1/4 w-1 h-56 bg-gradient-to-b from-transparent via-pink-500/20 to-purple-500/30 animate-pulse" style={{ animationDelay: '1s' }}></div>
+                    
+                    {/* Moving horizontal shimmer lines */}
+                    <div 
+                      className="absolute top-1/4 left-0 right-0 h-0.5"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.5), rgba(168, 85, 247, 0.5), transparent)',
+                        backgroundSize: '200% 100%',
+                        animation: 'shimmer 4s ease-in-out infinite'
+                      }}
+                    ></div>
+                    <div 
+                      className="absolute top-1/2 left-0 right-0 h-0.5"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), rgba(236, 72, 153, 0.5), transparent)',
+                        backgroundSize: '200% 100%',
+                        animation: 'shimmer 4s ease-in-out infinite',
+                        animationDelay: '1.3s'
+                      }}
+                    ></div>
+                    <div 
+                      className="absolute bottom-1/4 left-0 right-0 h-0.5"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.4), rgba(168, 85, 247, 0.4), transparent)',
+                        backgroundSize: '200% 100%',
+                        animation: 'shimmer 4s ease-in-out infinite',
+                        animationDelay: '2.6s'
+                      }}
+                    ></div>
+                  </div>
+                  {/* Moving gradient orbs */}
+                  <div className="absolute -top-20 -left-20 w-96 h-96 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-blue-500/10 rounded-full blur-3xl animate-float"></div>
+                  <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-blue-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
+                </div>
+
                 {selectedJob ? (
                   // Selected job from history
                   selectedJobData ? (
                     selectedJobData.status === 'completed' || selectedJobData.status === 'done' ? (
                       selectedJobData.result ? (
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-white">Results</h2>
-                            <Button variant="outline" onClick={() => setSelectedJob(null)} className="text-white border-blue-300/30 hover:bg-white/10">
+                        <div className="space-y-6 relative z-10">
+                          <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
+                              Results
+                            </h2>
+                            <Button variant="outline" onClick={() => setSelectedJob(null)} className="text-white border-purple-300/30 hover:bg-white/10 hover:border-pink-300/50 transition-all">
                               Close
                             </Button>
                           </div>
-                          <ResultView job={selectedJobData} />
+                          <ResultView job={selectedJobData} youtubeUrl={selectedJobData.video_url} />
                         </div>
                       ) : (
-                        <Card className="bg-white/5 border border-blue-300/20 backdrop-blur-sm">
+                        <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10 relative z-10">
                           <CardContent className="py-8 text-center">
-                            <Loader2 className="h-6 w-6 text-blue-400 animate-spin mx-auto mb-2" />
+                            <Loader2 className="h-6 w-6 text-pink-400 animate-spin mx-auto mb-2" />
                             <p className="text-white/70">Loading results...</p>
                           </CardContent>
                         </Card>
                       )
                     ) : (
-                      <Card className="bg-white/5 border border-blue-300/20 backdrop-blur-sm">
+                      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-purple-500/10 relative z-10">
                         <CardContent className="py-8">
                           <div className="flex items-center gap-2 justify-center">
-                            <Loader2 className="h-5 w-5 text-blue-400 animate-spin" />
+                            <Loader2 className="h-5 w-5 text-pink-400 animate-spin" />
                             <p className="text-white">Processing...</p>
                           </div>
                         </CardContent>
                       </Card>
                     )
                   ) : (
-                    <Card className="bg-white/5 border border-blue-300/20 backdrop-blur-sm">
+                    <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10 relative z-10">
                       <CardContent className="py-8 text-center">
-                        <Loader2 className="h-6 w-6 text-blue-400 animate-spin mx-auto mb-2" />
+                        <Loader2 className="h-6 w-6 text-pink-400 animate-spin mx-auto mb-2" />
                         <p className="text-white/70">Loading...</p>
                       </CardContent>
                     </Card>
                   )
                 ) : currentJob && (currentJob.status === 'completed' || currentJob.status === 'done') ? (
                   // Current job results
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-bold text-white">Results</h2>
-                      <Button variant="outline" onClick={handleRegenerate} className="text-white border-blue-300/30 hover:bg-white/10">
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Regenerate
-                      </Button>
-                    </div>
-                    {currentJob.result ? (
-                      <ResultView job={currentJob} youtubeUrl={youtubeUrl || undefined} />
-                    ) : (
-                      <Card className="bg-white/5 border border-blue-300/20 backdrop-blur-sm">
-                        <CardContent className="py-8 text-center">
-                          <p className="text-white/70">Loading results...</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
+                  <div className="space-y-6 relative z-10">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
+                        Results
+                      </h2>
+                      <Button variant="outline" onClick={handleRegenerate} className="text-white border-purple-300/30 hover:bg-white/10 hover:border-pink-300/50 transition-all">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Regenerate
+              </Button>
+            </div>
+            {currentJob.result ? (
+              <ResultView job={currentJob} youtubeUrl={youtubeUrl || undefined} />
+            ) : (
+                      <Card className="bg-white/5 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10">
+                <CardContent className="py-8 text-center">
+                  <p className="text-white/70">Loading results...</p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
                 ) : (
                   // No results
-                  <div className="text-center py-12">
-                    <p className="text-white/70">No results yet. Generate content to see results here.</p>
+                  <div className="text-center py-12 relative z-10">
+                    <div className="inline-block p-8 rounded-2xl bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-blue-500/10 border border-purple-300/20 backdrop-blur-sm shadow-lg shadow-pink-500/10">
+                      <p className="text-white/70 text-lg">No results yet. Generate content to see results here.</p>
+                    </div>
                   </div>
                 )}
               </div>
