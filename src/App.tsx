@@ -24,7 +24,6 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  
   return (
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
       <QueryClientProvider client={queryClient}>
