@@ -12,7 +12,6 @@ export function useRecentJobs() {
       return api.getRecentJobs(token || undefined);
     },
     enabled: isSignedIn,
-    refetchInterval: 30000, // Refetch every 30 seconds
   });
 }
 
